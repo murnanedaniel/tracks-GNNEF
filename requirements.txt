@@ -1,0 +1,7 @@
+pandas 
+matplotlib
+numpy
+git+https://github.com/LAL/trackml-library
+sklearn
+xgboost
+imblearn
