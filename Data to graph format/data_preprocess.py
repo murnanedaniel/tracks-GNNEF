@@ -8,14 +8,14 @@ Original file is located at
 """
 
 
-
+import os
 import numpy as np 
 import pandas as pd
 import trackml.dataset
 import time
 
 #files from 1000-1099
-def read_all_data(start, end):
+def read_all_data(input_dir, start, end):
     t0 = time.time()
     hits_list = []
     particle_list = []
@@ -25,7 +25,8 @@ def read_all_data(start, end):
     file_range = np.arange(start,end)
     #iteraletvely read the data and save 
     for file in file_range:
-        hits, particles, truth = trackml.dataset.load_event(f'../train_100_events/event00000{file}', parts=['hits', 'particles', 'truth'])
+        event_file = os.path.join(input_dir, f'event00000{file}')
+        hits, particles, truth = trackml.dataset.load_event(event_file, parts=['hits', 'particles', 'truth'])
         event_id = [file] * len(hits)
         hits['event_id'] = event_id
         hits_list.append(hits)
