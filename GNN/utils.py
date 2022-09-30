@@ -7,10 +7,11 @@ import torch
 
 
 class GraphDataset(Dataset):
-    def __init__(self,graph_files,transform=None, pre_transform=None):
+    def __init__(self,graph_files, direct=False, transform=None, pre_transform=None):
         super(GraphDataset,self).__init__()
 
         self.graph_files = graph_files
+        self.directed = direct
     
     @property                 
     def raw_file_names(self):
@@ -21,7 +22,17 @@ class GraphDataset(Dataset):
       return []
         
     def get(self, idx):
-      return torch.load(self.graph_files[idx])
+        graph = torch.load(self.graph_files[idx])
+        graph = self.handle_directedness(graph)
+        return graph
+
+    def handle_directedness(self, graph):
+        if not self.directed:
+            graph.edge_index = torch.cat([graph.edge_index, graph.edge_index.flip(0)], dim=1)
+            graph.y = torch.cat([graph.y, graph.y], dim=0)
+
+        return graph
+    
           
     def len(self):
       return len(self.graph_files)
@@ -58,7 +69,7 @@ def binary_acc(y_pred, y_test,thld):
 def make_mlp(
     input_size,
     sizes,
-    hidden_activation="SilU",
+    hidden_activation="SiLU",
     output_activation=None,
     layer_norm=True,
     batch_norm=False,
